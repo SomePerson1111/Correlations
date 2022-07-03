@@ -5,7 +5,7 @@ project(Extractor LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(nlohmann_json_DIR D:/soft/libs/json)
+set(nlohmann_json_DIR [nlohmann_json_DIR, download from https://github.com/nlohmann/json])
 find_package(nlohmann_json 3.10.5 REQUIRED)
 
 #add_definitions(-DTEST_ALL)
