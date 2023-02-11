@@ -1,2 +1,0 @@
-date	map	vehicle	win	dmg	hitp
-18.01.202321:26:55	Вестфилд	ussr-R52_Object_261	0	5684	0.5
