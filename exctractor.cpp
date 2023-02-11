@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include "D:\\soft\\libs\\json\\single_include\\nlohmann\\json.hpp"
 #include "extract.hpp"
 
 #include <list>
@@ -47,58 +46,16 @@ int main()
 }
 #else
 
-struct BattleData{
-    int dmg,win;
-    float hitp;
-    std::string vehicle,map,date;
-    BattleData(){}
-    BattleData(const nlohmann::json &J1,const nlohmann::json &J2):
-        dmg(extractDmg(J2)),
-        win(extractWin(J2)),
-        hitp(extractHitPercent(J2)),
-        vehicle(extractVehicle(J1)),
-        map(extractMap(J1)),
-        date(extractDateTime(J1)){}
 
-    bool operator > (const BattleData & D){
-        return date > D.date;
-    }
-    bool operator < (const BattleData & D){
-        return date < D.date;
-    }
-    bool operator >= (const BattleData & D){
-        return date > D.date;
-    }
-    bool operator <= (const BattleData & D){
-        return date < D.date;
-    }
-
-
-    static const std::string head(){return "date\tmap\tvehicle\twin\tdmg\thitp";};
-
-    std::string toString()const{
-        std::stringstream S;
-        S << date << "\t" <<  map<< "\t" <<  vehicle <<  "\t" <<  win << "\t" << dmg << "\t" << hitp;
-        return S.str();
-    }
-
-    friend std::ostream & operator << (std::ostream & os,const BattleData & D){
-        return os << D.toString();
-    }
-
-};
 
 int main(int argc,char ** argv)
 {
     //setlocale(LC_ALL, "Russian");
-    if(argc < 2){
-        std::cout << "need path to replays" << std::endl;
-        return 0;
-    }
+    
     std::vector<BattleData> AllData;
-    std::string path = argv[1];
+    const std::filesystem::path path{(argc > 1 ? argv[1] : ".")};
 
-    for(const auto &p : std::filesystem::directory_iterator(path)){
+    for(const auto &p : std::filesystem::directory_iterator{path}){
         if(p.is_regular_file() && p.path().filename().extension().string() == ".wotreplay"){
             std::cout << p.path().string() << std::endl;
             std::ifstream F(p.path().string());
@@ -123,8 +80,9 @@ int main(int argc,char ** argv)
     }
     std::sort(AllData.begin(),AllData.end());
 
-    std::ofstream ofs("replayinfo.txt");
+    std::ofstream ofs((argc > 2 ? argv[2] : "replayinfo.txt"));
     ofs<<BattleData::head()<<std::endl;
+    std::sort(AllData.begin(),AllData.end());
     for(const auto & dat : AllData){
         ofs<<dat<<std::endl;
     }

@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 #include <vector>
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
 std::string extractJson(std::istream &is){
 	std::vector<char> stack;
@@ -99,7 +99,7 @@ std::string extractMap(const nlohmann::json &J1){
     return S;
 }
 
-#define chekItem(item) if(item < Y.item) return false; if(item > Y.item) return true;
+
 struct DateTime{
     int year,month,day;
     int hour,minut,second;
@@ -120,28 +120,120 @@ struct DateTime{
 
     bool operator >= (const DateTime & Y)const{
 
-
+        #define chekItem(item) if(item < Y.item) return false; if(item > Y.item) return true;
         chekItem(year);
         chekItem(month);
         chekItem(day);
         chekItem(hour);
         chekItem(minut);
         chekItem(second);
+        #undef chekItem
         return true;
     }
     bool operator > (const DateTime &Y)const{
 
-        //#define chekItem(item) if(item < Y.item) return false; if(item > Y.item) return true;
+        #define chekItem(item) if(item < Y.item) return false; if(item > Y.item) return true;
         chekItem(year);
         chekItem(month);
         chekItem(day);
         chekItem(hour);
         chekItem(minut);
         chekItem(second);
+        #undef chekItem
         return false;
     }
     bool operator < (const DateTime & Y)const{return Y>(*this);}
     bool operator <= (const DateTime & Y)const{return Y>=(*this);}
+};
+
+template<bool B>
+struct converter;
+
+template<>
+struct converter<true>{
+    template <typename To,typename From>
+    inline static To convert(const From & x){
+        return x;
+    }
+};
+template<>
+struct converter<false>{
+    template <typename To,typename From>
+    inline static To convert(const From & x){
+        return To();
+    }
+};
+
+template <typename To,typename From>
+inline To convert(const From & V){
+    return converter<std::is_convertible<From,To>::value>::template convert<To,From>(V);
+}
+
+
+
+struct BattleData{
+    int dmg,win;
+    float hitp;
+    std::string vehicle,map,date;
+    BattleData(){}
+    BattleData(const nlohmann::json &J1,const nlohmann::json &J2):
+        dmg(extractDmg(J2)),
+        win(extractWin(J2)),
+        hitp(extractHitPercent(J2)),
+        vehicle(extractVehicle(J1)),
+        map(extractMap(J1)),
+        date(extractDateTime(J1)){}
+
+    bool operator > (const BattleData & D)const {
+        return DateTime(date) > DateTime(D.date);
+    }
+    bool operator < (const BattleData & D)const {
+        return DateTime(date) < DateTime(D.date);
+    }
+    bool operator >= (const BattleData & D)const {
+        return DateTime(date) > DateTime(D.date);
+    }
+    bool operator <= (const BattleData & D)const {
+        return DateTime(date) <= DateTime(D.date);
+    }
+
+
+    static const std::string head(){return "date\tmap\tvehicle\twin\tdmg\thitp";};
+
+    template <typename T>
+    const T get(const std::string & par) const{
+        #define RET_PARAM(param) \
+        (par == #param){return convert<T>(param);}
+        if RET_PARAM(date)
+        else if RET_PARAM(map)
+        else if RET_PARAM(vehicle)
+        else if RET_PARAM(win)
+        else if RET_PARAM(dmg)
+        else if RET_PARAM(hitp)
+        else{
+            return convert<T>("error");
+        }
+    }
+
+    std::string toString()const{
+        std::stringstream S;
+        S << date << "\t" <<  map<< "\t" <<  vehicle <<  "\t" <<  win << "\t" << dmg << "\t" << hitp;
+        return S.str();
+    }
+
+    friend std::ostream & operator << (std::ostream & os,const BattleData & D){
+        return os << D.toString();
+    }
+    friend std::istream & operator >> (std::istream & is,BattleData & D){
+        std::string S;
+        std::getline(is,D.date,'\t');
+        std::getline(is,D.map,'\t');
+        std::getline(is,D.vehicle,'\t');
+
+        is >> D.win >> D.dmg >> D.hitp;
+        return is;
+    }
+
 };
 
 
