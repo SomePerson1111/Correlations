@@ -68,14 +68,17 @@ int main(int argc,char ** argv)
             auto S2 = extractJson(F);
             //std::cout << "S2 exracted" << std::endl;
 
-            nlohmann::json J1 = nlohmann::json::parse(S1);//[0]["personal"].begin().value();
-            nlohmann::json J2 = nlohmann::json::parse(S2);
+            try{
+                nlohmann::json J1 = nlohmann::json::parse(S1);//[0]["personal"].begin().value();
+                nlohmann::json J2 = nlohmann::json::parse(S2);
+                AllData.push_back(BattleData(J1,J2));
+            }catch(std::exception & e){
+                std::cout << "unable to parse" <<std::endl;
+            }
 
             //std::cout << "created json" <<std::endl;
 
-            //std::cout << BattleData(J1,J2)<<std::endl;
-
-            AllData.push_back(BattleData(J1,J2));
+            //std::cout << BattleData(J1,J2)<<std::endl
         }
     }
     std::sort(AllData.begin(),AllData.end());

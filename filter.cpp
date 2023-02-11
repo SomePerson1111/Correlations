@@ -40,7 +40,7 @@ int main(int argc,char **argv){
     std::string s;
     std::getline(file,s);
     while(file >> tmp){
-        if(vehicle.empty() or tmp.vehicle == vehicle)
+        if(vehicle.empty() || tmp.vehicle == vehicle)
             dynamics.push_back(tmp.get<double>(param));   
     }
 

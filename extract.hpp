@@ -4,6 +4,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <sstream>
 #include <vector>
 #include "nlohmann/json.hpp"
 
@@ -24,14 +25,14 @@ std::string extractJson(std::istream &is){
              S += c;
              stack.push_back('{');
          }
-         else if(c == '}' || c == ']'){
+         else if(stack.size() && (c == '}' || c == ']')){
              S += c;
              stack.pop_back();
              if(stack.size() == 0)
                  break;
          }
          else{
-             if(stack.size())
+            if(stack.size())
                 S += c;
          }
 	}
@@ -204,6 +205,7 @@ struct BattleData{
     const T get(const std::string & par) const{
         #define RET_PARAM(param) \
         (par == #param){return convert<T>(param);}
+        
         if RET_PARAM(date)
         else if RET_PARAM(map)
         else if RET_PARAM(vehicle)

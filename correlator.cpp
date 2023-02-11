@@ -49,13 +49,13 @@ int main(int argc,char **argv){
     std::cout << "mean is " << mean << std::endl;
     std::cout << "sigma is " << sigma << std::endl;
     double del = 1;
-    if(argc > 2 and argv[2] == "norm")
+    if(argc > 2 && argv[2] == "norm")
         std::swap(sigma,del);
     for(auto &v: dynamics){
         v = (v-mean)/del;
     }
 
-    bool fac2 = (argc > 3 and argv[3] == "/N");
+    bool fac2 = (argc > 3 && argv[3] == "/N");
 
 
     std::ofstream result("result.txt");

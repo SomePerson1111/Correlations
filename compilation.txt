@@ -1,0 +1,4 @@
+cl /EHsc /std:c++17 correlator.cpp
+cl /EHsc /std:c++17 filter.cpp
+cl /EHsc /std:c++17 exctractor.cpp
+
